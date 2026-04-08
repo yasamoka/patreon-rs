@@ -35,18 +35,18 @@
 //! let members = creator_client.campaign_members("campaign_id").await?;
 //! ```
 
+pub mod creator_client;
 pub mod error;
 pub mod models;
 pub mod oauth;
 pub mod user_client;
-pub mod creator_client;
 pub mod webhook;
 
+pub use creator_client::PatreonCreatorClient;
 pub use error::{Error, Result};
 pub use models::*;
 pub use oauth::OAuthClient;
 pub use user_client::PatreonUserClient;
-pub use creator_client::PatreonCreatorClient;
 pub use webhook::WebhookValidator;
 
 #[cfg(all(feature = "native-tls", feature = "rustls"))]

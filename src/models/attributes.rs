@@ -2,9 +2,9 @@
 //!
 //! Each resource type has a corresponding attributes struct.
 
+use super::serde_helpers::{de_null_default, de_null_unix_epoch, unix_epoch};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use super::serde_helpers::{de_null_default, de_null_unix_epoch, unix_epoch};
 
 // ============== User ==============
 
@@ -56,10 +56,7 @@ pub struct UserAttributes {
     pub is_email_verified: bool,
 
     /// Account creation time.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created: DateTime<Utc>,
 
     /// Whether pledges are hidden.
@@ -103,10 +100,7 @@ impl Default for UserAttributes {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CampaignAttributes {
     /// Campaign creation time.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Creation name / what the creator makes.
@@ -190,10 +184,7 @@ pub struct CampaignAttributes {
     pub pledge_sum_currency: String,
 
     /// Published at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub published_at: DateTime<Utc>,
 
     /// Summary.
@@ -286,10 +277,7 @@ pub struct MemberAttributes {
     pub lifetime_support_cents: i32,
 
     /// Last charge date.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub last_charge_date: DateTime<Utc>,
 
     /// Last charge status.
@@ -297,17 +285,11 @@ pub struct MemberAttributes {
     pub last_charge_status: ChargeStatus,
 
     /// Next charge date.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub next_charge_date: DateTime<Utc>,
 
     /// Pledge relationship start.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub pledge_relationship_start: DateTime<Utc>,
 
     /// Note.
@@ -411,10 +393,7 @@ pub struct TierAttributes {
     pub amount_cents: i32,
 
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Description.
@@ -426,10 +405,7 @@ pub struct TierAttributes {
     pub discord_role_ids: Vec<String>,
 
     /// Edited at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub edited_at: DateTime<Utc>,
 
     /// Image URL.
@@ -449,10 +425,7 @@ pub struct TierAttributes {
     pub published: bool,
 
     /// Published at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub published_at: DateTime<Utc>,
 
     /// Title.
@@ -460,10 +433,7 @@ pub struct TierAttributes {
     pub title: String,
 
     /// Unpublished at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub unpublished_at: DateTime<Utc>,
 
     /// Tier URL.
@@ -523,24 +493,15 @@ pub struct PostAttributes {
     pub is_paid: bool,
 
     /// Published at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub published_at: DateTime<Utc>,
 
     /// Edited at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub edited_at: DateTime<Utc>,
 
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Embed data.
@@ -660,10 +621,7 @@ pub struct BenefitAttributes {
     pub rule_type: String,
 
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Whether published.
@@ -691,10 +649,7 @@ pub struct BenefitAttributes {
     pub not_delivered_deliverables_count: i32,
 
     /// Next deliverable due date.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub next_deliverable_due_date: DateTime<Utc>,
 
     /// Tiers count.
@@ -750,10 +705,7 @@ pub struct AddressAttributes {
     pub country: String,
 
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Line 1.
@@ -781,10 +733,7 @@ pub struct AddressAttributes {
     pub confirmed: bool,
 
     /// Confirmed at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub confirmed_at: DateTime<Utc>,
 }
 
@@ -820,10 +769,7 @@ pub struct GoalAttributes {
     pub completed_percentage: i32,
 
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Description.
@@ -831,10 +777,7 @@ pub struct GoalAttributes {
     pub description: String,
 
     /// Reached at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub reached_at: DateTime<Utc>,
 
     /// Title.
@@ -861,10 +804,7 @@ impl Default for GoalAttributes {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MediaAttributes {
     /// Created at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub created_at: DateTime<Utc>,
 
     /// Download URL.
@@ -908,10 +848,7 @@ pub struct MediaAttributes {
     pub state: String,
 
     /// Upload expires at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub upload_expires_at: DateTime<Utc>,
 
     /// Upload parameters.
@@ -950,10 +887,7 @@ impl Default for MediaAttributes {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WebhookAttributes {
     /// Last attempted at.
-    #[serde(
-        default = "unix_epoch",
-        deserialize_with = "de_null_unix_epoch"
-    )]
+    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
     pub last_attempted_at: DateTime<Utc>,
 
     /// Consecutive failure count.

@@ -29,7 +29,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             },
         )
         .await?;
-    println!("campaign_posts_with_query.count: {}", posts_with_query.data.len());
+    println!(
+        "campaign_posts_with_query.count: {}",
+        posts_with_query.data.len()
+    );
 
     let posts_with_details = client.campaign_posts_with_details(&campaign_id).await?;
     println!(

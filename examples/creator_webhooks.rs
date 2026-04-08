@@ -46,7 +46,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("created_webhook.id: {webhook_id}");
 
     let updated = client
-        .update_webhook(&webhook_id, None, Some(&[webhook_triggers::MEMBERS_CREATE]), Some(true))
+        .update_webhook(
+            &webhook_id,
+            None,
+            Some(&[webhook_triggers::MEMBERS_CREATE]),
+            Some(true),
+        )
         .await?;
     println!("updated_webhook.id: {}", updated.data.id);
 

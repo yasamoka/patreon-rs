@@ -73,7 +73,9 @@ fn parse_query(path: &str) -> (String, Vec<(String, String)>) {
         let mut kv = pair.splitn(2, '=');
         let k = kv.next().unwrap_or("").to_string();
         let v = kv.next().unwrap_or("");
-        let v = urlencoding::decode(v).unwrap_or_else(|_| v.into()).to_string();
+        let v = urlencoding::decode(v)
+            .unwrap_or_else(|_| v.into())
+            .to_string();
         out.push((k, v));
     }
     (route, out)

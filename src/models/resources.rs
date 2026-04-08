@@ -2,8 +2,8 @@
 //!
 //! Defines resource types returned by the Patreon API.
 
-use serde::{Deserialize, Serialize};
 use super::attributes::*;
+use serde::{Deserialize, Serialize};
 
 /// Resource type enum.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]

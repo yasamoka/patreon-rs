@@ -12,8 +12,8 @@
 //! - `/api/oauth2/v2/identity` - Fetch the currently authorized user
 
 use crate::models::*;
-use crate::{Error, Result, API_BASE_URL};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use crate::{API_BASE_URL, Error, Result};
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
 
 /// Patreon user API client.
 ///
@@ -71,8 +71,7 @@ impl PatreonUserClient {
         let mut headers = HeaderMap::new();
         headers.insert(
             AUTHORIZATION,
-            HeaderValue::from_str(&format!("Bearer {}", self.access_token))
-                .expect("Invalid token"),
+            HeaderValue::from_str(&format!("Bearer {}", self.access_token)).expect("Invalid token"),
         );
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers

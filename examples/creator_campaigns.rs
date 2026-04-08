@@ -37,7 +37,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let campaign = client.campaign(&campaign_id).await?;
     println!("campaign.id: {}", campaign.data.id);
 
-    let campaign_with_tiers_and_benefits = client.campaign_with_tiers_and_benefits(&campaign_id).await?;
+    let campaign_with_tiers_and_benefits = client
+        .campaign_with_tiers_and_benefits(&campaign_id)
+        .await?;
     println!(
         "campaign_with_tiers_and_benefits.id: {}",
         campaign_with_tiers_and_benefits.data.id
@@ -45,4 +47,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     Ok(())
 }
-

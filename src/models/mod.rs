@@ -6,11 +6,11 @@
 //! - `links`: pagination links
 //! - `meta`: metadata
 
+mod attributes;
 mod resources;
 mod response;
-mod attributes;
 mod serde_helpers;
 
+pub use attributes::*;
 pub use resources::*;
 pub use response::*;
-pub use attributes::*;

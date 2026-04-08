@@ -19,4 +19,3 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("deleted_webhook.id: {webhook_id}");
     Ok(())
 }
-

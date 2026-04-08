@@ -1,4 +1,4 @@
-use patreon::{MemberResource, PatronStatus, PatreonUserClient, ResourceType};
+use patreon::{MemberResource, PatreonUserClient, PatronStatus, ResourceType};
 
 fn env(name: &str) -> String {
     std::env::var(name).unwrap_or_else(|_| panic!("{name} is required"))

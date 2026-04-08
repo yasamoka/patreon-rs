@@ -2,7 +2,7 @@
 //!
 //! Implements the Patreon OAuth 2.0 authorization flow.
 
-use crate::{Error, Result, OAUTH_AUTHORIZE_URL, OAUTH_TOKEN_URL};
+use crate::{Error, OAUTH_AUTHORIZE_URL, OAUTH_TOKEN_URL, Result};
 use chrono::{DateTime, Duration, Utc};
 use serde::{Deserialize, Serialize};
 
@@ -245,9 +245,13 @@ mod tests {
 
     #[test]
     fn test_authorization_url() {
-        let client = OAuthClient::new("test_client_id", "test_secret", "https://example.com/callback");
+        let client = OAuthClient::new(
+            "test_client_id",
+            "test_secret",
+            "https://example.com/callback",
+        );
         let url = client.authorization_url(&[scopes::IDENTITY, scopes::IDENTITY_MEMBERSHIPS]);
-        
+
         assert!(url.contains("client_id=test_client_id"));
         assert!(url.contains("redirect_uri=https%3A%2F%2Fexample.com%2Fcallback"));
         assert!(url.contains("scope=identity%20identity.memberships"));
@@ -255,9 +259,13 @@ mod tests {
 
     #[test]
     fn test_authorization_url_with_state() {
-        let client = OAuthClient::new("test_client_id", "test_secret", "https://example.com/callback");
+        let client = OAuthClient::new(
+            "test_client_id",
+            "test_secret",
+            "https://example.com/callback",
+        );
         let url = client.authorization_url_with_state(&[scopes::IDENTITY], "random_state");
-        
+
         assert!(url.contains("state=random_state"));
     }
 }

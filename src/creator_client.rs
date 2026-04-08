@@ -19,8 +19,8 @@
 //! - `/api/oauth2/v2/webhooks` - manage webhooks
 
 use crate::models::*;
-use crate::{Error, Result, API_BASE_URL};
-use reqwest::header::{HeaderMap, HeaderValue, AUTHORIZATION, CONTENT_TYPE};
+use crate::{API_BASE_URL, Error, Result};
+use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Serialize;
 
 /// Patreon creator (server) API client.
@@ -145,8 +145,7 @@ impl PatreonCreatorClient {
         let mut headers = HeaderMap::new();
         headers.insert(
             AUTHORIZATION,
-            HeaderValue::from_str(&format!("Bearer {}", self.access_token))
-                .expect("Invalid token"),
+            HeaderValue::from_str(&format!("Bearer {}", self.access_token)).expect("Invalid token"),
         );
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers
@@ -341,7 +340,10 @@ impl PatreonCreatorClient {
         campaign_id: &str,
         query: &MembersQuery,
     ) -> Result<ListResponse<MemberResource>> {
-        let mut endpoint = format!("/campaigns/{}/members?include=user,currently_entitled_tiers,address&fields[member]=campaign_lifetime_support_cents,currently_entitled_amount_cents,email,full_name,is_follower,last_charge_date,last_charge_status,lifetime_support_cents,next_charge_date,note,patron_status,pledge_relationship_start,will_pay_amount_cents&fields[user]=email,full_name,image_url,url,vanity&fields[tier]=amount_cents,title,url&fields[address]=addressee,city,country,line_1,line_2,phone_number,postal_code,state", campaign_id);
+        let mut endpoint = format!(
+            "/campaigns/{}/members?include=user,currently_entitled_tiers,address&fields[member]=campaign_lifetime_support_cents,currently_entitled_amount_cents,email,full_name,is_follower,last_charge_date,last_charge_status,lifetime_support_cents,next_charge_date,note,patron_status,pledge_relationship_start,will_pay_amount_cents&fields[user]=email,full_name,image_url,url,vanity&fields[tier]=amount_cents,title,url&fields[address]=addressee,city,country,line_1,line_2,phone_number,postal_code,state",
+            campaign_id
+        );
 
         if let Some(ref cursor) = query.cursor {
             endpoint.push_str(&format!("&page[cursor]={}", cursor));
@@ -417,10 +419,7 @@ impl PatreonCreatorClient {
     }
 
     /// Fetches a post including related resources.
-    pub async fn post_with_details(
-        &self,
-        post_id: &str,
-    ) -> Result<SingleResponse<PostResource>> {
+    pub async fn post_with_details(&self, post_id: &str) -> Result<SingleResponse<PostResource>> {
         self.get(&format!("/posts/{}?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url,was_posted_by_campaign_owner,comment_count,like_count,teaser_text&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", post_id)).await
     }
 
@@ -523,7 +522,8 @@ impl PatreonCreatorClient {
             },
         };
 
-        self.patch(&format!("/webhooks/{}", webhook_id), &body).await
+        self.patch(&format!("/webhooks/{}", webhook_id), &body)
+            .await
     }
 
     /// Deletes a webhook.

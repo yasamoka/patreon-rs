@@ -2,8 +2,8 @@
 //!
 //! JSON:API response wrappers.
 
-use serde::{Deserialize, Serialize};
 use super::serde_helpers::de_null_default;
+use serde::{Deserialize, Serialize};
 
 /// JSON:API response wrapper.
 #[derive(Debug, Clone, Serialize, Deserialize)]
