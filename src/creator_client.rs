@@ -18,6 +18,8 @@
 //! - `/api/oauth2/v2/posts/{post_id}` - fetch a post
 //! - `/api/oauth2/v2/webhooks` - manage webhooks
 
+use std::borrow::Cow;
+
 use crate::models::*;
 use crate::{API_BASE_URL, Error, Result};
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
@@ -46,24 +48,6 @@ pub struct PatreonCreatorClient {
     access_token: String,
     http_client: reqwest::Client,
     base_url: String,
-}
-
-/// Query parameters for listing members.
-#[derive(Debug, Clone, Default)]
-pub struct MembersQuery {
-    /// Cursor (for pagination).
-    pub cursor: Option<String>,
-    /// Page size (max 1000).
-    pub page_size: Option<u32>,
-}
-
-/// Query parameters for listing posts.
-#[derive(Debug, Clone, Default)]
-pub struct PostsQuery {
-    /// Cursor (for pagination).
-    pub cursor: Option<String>,
-    /// Page size (max 100).
-    pub page_size: Option<u32>,
 }
 
 /// Parameters for creating a webhook.
@@ -251,176 +235,127 @@ impl PatreonCreatorClient {
 
     // ==================== Campaigns API ====================
 
-    /// Lists all campaigns owned by the current creator.
-    ///
-    /// # Required scopes
-    /// - `campaigns`
-    pub async fn campaigns(&self) -> Result<ListResponse<CampaignResource>> {
-        self.get("/campaigns").await
-    }
-
     /// Lists campaigns with details.
     ///
     /// Returns detailed campaign information including creator info.
-    pub async fn campaigns_with_details(&self) -> Result<ListResponse<CampaignResource>> {
-        self.get("/campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity&fields[user]=full_name,image_url,url").await
+    /// # Parameters
+    /// - `fields`: campaign fields
+    /// - `includes`: top-level includes
+    /// # Required scopes
+    /// - `campaigns`
+    pub async fn campaigns(
+        &self,
+        fields: Option<CampaignFields>,
+        includes: Option<CampaignIncludes>,
+    ) -> Result<ListResponse<CampaignResource>> {
+        self.get(format!("/campaigns{}", (fields, includes).query_params()).as_str())
+            .await
     }
 
     /// Fetches a specific campaign.
     ///
     /// # Parameters
-    /// - `campaign_id`: campaign ID
-    pub async fn campaign(&self, campaign_id: &str) -> Result<SingleResponse<CampaignResource>> {
-        self.get(&format!("/campaigns/{}", campaign_id)).await
-    }
-
-    /// Fetches a campaign including tiers and benefits.
-    ///
-    /// # Parameters
-    /// - `campaign_id`: campaign ID
-    pub async fn campaign_with_tiers_and_benefits(
+    /// - `id`: campaign ID
+    /// - `fields`: campaign fields
+    /// - `includes: top-level includes
+    pub async fn campaign(
         &self,
-        campaign_id: &str,
+        id: &str,
+        fields: Option<CampaignFields>,
+        includes: Option<CampaignIncludes>,
     ) -> Result<SingleResponse<CampaignResource>> {
-        self.get(&format!("/campaigns/{}?include=tiers,tiers.benefits,creator,goals&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity,show_earnings&fields[tier]=amount_cents,created_at,description,discord_role_ids,edited_at,image_url,patron_count,post_count,published,published_at,title,unpublished_at,url,user_limit&fields[benefit]=benefit_type,created_at,deliverables_due_today_count,delivered_deliverables_count,description,is_deleted,is_published,next_deliverable_due_date,not_delivered_deliverables_count,rule_type,tiers_count,title&fields[goal]=amount_cents,completed_percentage,created_at,description,reached_at,title&fields[user]=full_name,image_url,url", campaign_id)).await
+        self.get(format!("/campaigns/{}{}", id, (fields, includes).query_params()).as_str())
+            .await
     }
 
     // ==================== Members API ====================
 
-    /// Lists all members for a campaign.
+    /// Lists campaign members including related resources with pagination.
     ///
     /// # Parameters
     /// - `campaign_id`: campaign ID
-    ///
+    /// - `member_fields: member fields
+    /// - `includes`: top-level includes
+    /// - `query`: query parameters
     /// # Required scopes
     /// - `campaigns.members`
     pub async fn campaign_members(
         &self,
         campaign_id: &str,
+        member_fields: Option<MemberFields>,
+        includes: Option<MemberIncludes>,
+        query: Option<MembersQuery>,
     ) -> Result<ListResponse<MemberResource>> {
-        self.get(&format!("/campaigns/{}/members", campaign_id))
-            .await
-    }
-
-    /// Lists campaign members with pagination parameters.
-    ///
-    /// # Parameters
-    /// - `campaign_id`: campaign ID
-    /// - `query`: query parameters
-    pub async fn campaign_members_with_query(
-        &self,
-        campaign_id: &str,
-        query: &MembersQuery,
-    ) -> Result<ListResponse<MemberResource>> {
-        let mut endpoint = format!("/campaigns/{}/members?", campaign_id);
-
-        if let Some(ref cursor) = query.cursor {
-            endpoint.push_str(&format!("page[cursor]={}&", cursor));
-        }
-        if let Some(page_size) = query.page_size {
-            endpoint.push_str(&format!("page[count]={}&", page_size.min(1000)));
-        }
-
-        self.get(&endpoint).await
-    }
-
-    /// Lists campaign members including related resources.
-    ///
-    /// Includes user info, currently entitled tiers, and address (if available).
-    pub async fn campaign_members_with_details(
-        &self,
-        campaign_id: &str,
-    ) -> Result<ListResponse<MemberResource>> {
-        self.get(&format!("/campaigns/{}/members?include=user,currently_entitled_tiers,address&fields[member]=campaign_lifetime_support_cents,currently_entitled_amount_cents,email,full_name,is_follower,last_charge_date,last_charge_status,lifetime_support_cents,next_charge_date,note,patron_status,pledge_relationship_start,will_pay_amount_cents&fields[user]=email,full_name,image_url,url,vanity&fields[tier]=amount_cents,title,url&fields[address]=addressee,city,country,line_1,line_2,phone_number,postal_code,state", campaign_id)).await
-    }
-
-    /// Lists campaign members including related resources with pagination.
-    pub async fn campaign_members_with_details_and_query(
-        &self,
-        campaign_id: &str,
-        query: &MembersQuery,
-    ) -> Result<ListResponse<MemberResource>> {
-        let mut endpoint = format!(
-            "/campaigns/{}/members?include=user,currently_entitled_tiers,address&fields[member]=campaign_lifetime_support_cents,currently_entitled_amount_cents,email,full_name,is_follower,last_charge_date,last_charge_status,lifetime_support_cents,next_charge_date,note,patron_status,pledge_relationship_start,will_pay_amount_cents&fields[user]=email,full_name,image_url,url,vanity&fields[tier]=amount_cents,title,url&fields[address]=addressee,city,country,line_1,line_2,phone_number,postal_code,state",
-            campaign_id
-        );
-
-        if let Some(ref cursor) = query.cursor {
-            endpoint.push_str(&format!("&page[cursor]={}", cursor));
-        }
-        if let Some(page_size) = query.page_size {
-            endpoint.push_str(&format!("&page[count]={}", page_size.min(1000)));
-        }
-
-        self.get(&endpoint).await
+        self.get(
+            format!(
+                "/campaigns/{}/members{}",
+                campaign_id,
+                (member_fields, includes, query).query_params()
+            )
+            .as_str(),
+        )
+        .await
     }
 
     /// Fetches a specific member.
     ///
     /// # Parameters
-    /// - `member_id`: member ID
-    pub async fn member(&self, member_id: &str) -> Result<SingleResponse<MemberResource>> {
-        self.get(&format!("/members/{}", member_id)).await
-    }
-
-    /// Fetches a member including related resources.
-    pub async fn member_with_details(
+    /// - `id`: member ID
+    /// - `fields`: member fields
+    /// - `includes`: top-level includes
+    pub async fn member(
         &self,
-        member_id: &str,
+        id: &str,
+        fields: Option<MemberFields>,
+        includes: Option<MemberIncludes>,
     ) -> Result<SingleResponse<MemberResource>> {
-        self.get(&format!("/members/{}?include=user,currently_entitled_tiers,address,campaign&fields[member]=campaign_lifetime_support_cents,currently_entitled_amount_cents,email,full_name,is_follower,last_charge_date,last_charge_status,lifetime_support_cents,next_charge_date,note,patron_status,pledge_relationship_start,will_pay_amount_cents&fields[user]=email,full_name,image_url,url,vanity&fields[tier]=amount_cents,title,url&fields[address]=addressee,city,country,line_1,line_2,phone_number,postal_code,state&fields[campaign]=creation_name,image_url,url,vanity", member_id)).await
+        self.get(format!("/members/{}{}", id, (fields, includes).query_params()).as_str())
+            .await
     }
 
     // ==================== Posts API ====================
 
-    /// Lists all posts for a campaign.
+    /// Lists campaign posts with pagination.
     ///
     /// # Parameters
     /// - `campaign_id`: campaign ID
-    ///
+    /// - `post_fields`: post fields
+    /// - `includes`: top-level includes
+    /// - `query`: query parameters
     /// # Required scopes
     /// - `campaigns.posts`
-    pub async fn campaign_posts(&self, campaign_id: &str) -> Result<ListResponse<PostResource>> {
-        self.get(&format!("/campaigns/{}/posts", campaign_id)).await
-    }
-
-    /// Lists campaign posts with pagination parameters.
-    pub async fn campaign_posts_with_query(
+    pub async fn campaign_posts(
         &self,
         campaign_id: &str,
-        query: &PostsQuery,
+        post_fields: Option<PostFields>,
+        includes: Option<PostIncludes>,
+        query: Option<PostsQuery>,
     ) -> Result<ListResponse<PostResource>> {
-        let mut endpoint = format!("/campaigns/{}/posts?", campaign_id);
-
-        if let Some(ref cursor) = query.cursor {
-            endpoint.push_str(&format!("page[cursor]={}&", cursor));
-        }
-        if let Some(page_size) = query.page_size {
-            endpoint.push_str(&format!("page[count]={}&", page_size.min(100)));
-        }
-
-        self.get(&endpoint).await
-    }
-
-    /// Lists campaign posts including related resources.
-    pub async fn campaign_posts_with_details(
-        &self,
-        campaign_id: &str,
-    ) -> Result<ListResponse<PostResource>> {
-        self.get(&format!("/campaigns/{}/posts?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", campaign_id)).await
+        self.get(
+            format!(
+                "/campaigns/{}/posts{}",
+                campaign_id,
+                (post_fields, includes, query).query_params()
+            )
+            .as_str(),
+        )
+        .await
     }
 
     /// Fetches a specific post.
     ///
     /// # Parameters
-    /// - `post_id`: post ID
-    pub async fn post(&self, post_id: &str) -> Result<SingleResponse<PostResource>> {
-        self.get(&format!("/posts/{}", post_id)).await
-    }
-
-    /// Fetches a post including related resources.
-    pub async fn post_with_details(&self, post_id: &str) -> Result<SingleResponse<PostResource>> {
-        self.get(&format!("/posts/{}?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", post_id)).await
+    /// - `id`: post ID
+    /// - `fieldws`: post fields
+    /// - `includes`: top-level includes
+    pub async fn post(
+        &self,
+        id: &str,
+        fields: Option<PostFields>,
+        includes: Option<PostIncludes>,
+    ) -> Result<SingleResponse<PostResource>> {
+        self.get(format!("/posts/{}{}", id, (fields, includes).query_params()).as_str())
+            .await
     }
 
     // ==================== Webhooks API ====================
@@ -535,46 +470,47 @@ impl PatreonCreatorClient {
     }
 }
 
-/// Field names for campaign resources.
-pub mod campaign_fields {
-    pub const CREATED_AT: &str = "created_at";
-    pub const CREATION_NAME: &str = "creation_name";
-    pub const DISCORD_SERVER_ID: &str = "discord_server_id";
-    pub const GOOGLE_ANALYTICS_ID: &str = "google_analytics_id";
-    pub const IMAGE_URL: &str = "image_url";
-    pub const IMAGE_SMALL_URL: &str = "image_small_url";
-    pub const IS_CHARGED_IMMEDIATELY: &str = "is_charged_immediately";
-    pub const IS_MONTHLY: &str = "is_monthly";
-    pub const IS_NSFW: &str = "is_nsfw";
-    pub const MAIN_VIDEO_EMBED: &str = "main_video_embed";
-    pub const MAIN_VIDEO_URL: &str = "main_video_url";
-    pub const ONE_LINER: &str = "one_liner";
-    pub const PATRON_COUNT: &str = "patron_count";
-    pub const PAY_PER_NAME: &str = "pay_per_name";
-    pub const PUBLISHED_AT: &str = "published_at";
-    pub const SUMMARY: &str = "summary";
-    pub const THANKS_EMBED: &str = "thanks_embed";
-    pub const THANKS_MSG: &str = "thanks_msg";
-    pub const THANKS_VIDEO_URL: &str = "thanks_video_url";
-    pub const URL: &str = "url";
-    pub const VANITY: &str = "vanity";
+trait Params {
+    fn query_params(&self) -> Cow<'static, str>;
 }
 
-/// Field names for member resources.
-pub mod member_fields {
-    pub const CAMPAIGN_LIFETIME_SUPPORT_CENTS: &str = "campaign_lifetime_support_cents";
-    pub const CURRENTLY_ENTITLED_AMOUNT_CENTS: &str = "currently_entitled_amount_cents";
-    pub const EMAIL: &str = "email";
-    pub const FULL_NAME: &str = "full_name";
-    pub const IS_FOLLOWER: &str = "is_follower";
-    pub const LAST_CHARGE_DATE: &str = "last_charge_date";
-    pub const LAST_CHARGE_STATUS: &str = "last_charge_status";
-    pub const LIFETIME_SUPPORT_CENTS: &str = "lifetime_support_cents";
-    pub const NEXT_CHARGE_DATE: &str = "next_charge_date";
-    pub const NOTE: &str = "note";
-    pub const PATRON_STATUS: &str = "patron_status";
-    pub const PLEDGE_RELATIONSHIP_START: &str = "pledge_relationship_start";
-    pub const WILL_PAY_AMOUNT_CENTS: &str = "will_pay_amount_cents";
+impl<F: Fields, I: Includes> Params for (Option<F>, Option<I>) {
+    fn query_params(&self) -> Cow<'static, str> {
+        let (fields, includes) = self;
+        match (fields, includes) {
+            (None, None) => Cow::Borrowed(""),
+            (None, Some(includes)) => Cow::Owned(format!("?{}", includes.include())),
+            (Some(fields), None) => Cow::Owned(format!("?{}", fields.fields())),
+            (Some(fields), Some(includes)) => Cow::Owned(format!(
+                "?{}&{}&{}",
+                includes.include(),
+                fields.fields(),
+                includes.fields()
+            )),
+        }
+    }
+}
+
+impl<F: Fields, I: Includes, Q: Query> Params for (Option<F>, Option<I>, Option<Q>) {
+    fn query_params(&self) -> Cow<'static, str> {
+        let (fields, includes, query) = self;
+        match (fields, includes, query) {
+            (None, None, None) => Cow::Borrowed(""),
+            (fields, includes, query) => Cow::Owned(format!(
+                "?{}",
+                [
+                    includes.as_ref().map(Includes::include),
+                    fields.as_ref().map(Fields::fields),
+                    includes.as_ref().map(Includes::fields),
+                    query.as_ref().map(Query::query_params).flatten()
+                ]
+                .into_iter()
+                .filter_map(|s| s)
+                .collect::<Vec<_>>()
+                .join("&")
+            )),
+        }
+    }
 }
 
 /// Webhook trigger string constants.
@@ -619,7 +555,7 @@ mod tests {
         CAMPAIGN
             .get_or_init(async || {
                 let client = client();
-                let campaigns = client.campaigns().await.unwrap();
+                let campaigns = client.campaigns(None, None).await.unwrap();
                 campaigns.data.into_iter().next().unwrap()
             })
             .await
@@ -631,7 +567,10 @@ mod tests {
             .get_or_init(async || {
                 let client = client();
                 let campaign = campaign().await;
-                let members = client.campaign_members(&campaign.id).await.unwrap();
+                let members = client
+                    .campaign_members(&campaign.id, None, None, None)
+                    .await
+                    .unwrap();
                 members.data.into_iter().next().unwrap()
             })
             .await
@@ -642,7 +581,10 @@ mod tests {
         POST.get_or_init(async || {
             let client = client();
             let campaign = campaign().await;
-            let posts = client.campaign_posts(&campaign.id).await.unwrap();
+            let posts = client
+                .campaign_posts(&campaign.id, None, None, None)
+                .await
+                .unwrap();
             posts.data.into_iter().next().unwrap()
         })
         .await
@@ -651,13 +593,22 @@ mod tests {
     #[tokio_shared_rt::test(shared)]
     async fn test_campaigns() {
         let client = client();
-        client.campaigns().await.unwrap();
+        client.campaigns(None, None).await.unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
     async fn test_campaigns_with_details() {
         let client = client();
-        client.campaigns_with_details().await.unwrap();
+        client
+            .campaigns(
+                Some(CampaignFields::all()),
+                Some(CampaignIncludes {
+                    creator: Some(UserFields::all()),
+                    ..Default::default()
+                }),
+            )
+            .await
+            .unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
@@ -670,7 +621,11 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_with_tiers_and_benefits(&campaign.id)
+            .campaign(
+                &campaign.id,
+                Some(CampaignFields::all()),
+                Some(CampaignIncludes::all()),
+            )
             .await
             .unwrap();
     }
@@ -679,7 +634,10 @@ mod tests {
     async fn test_campaign_members() {
         let client = client();
         let campaign = campaign().await;
-        client.campaign_members(&campaign.id).await.unwrap();
+        client
+            .campaign_members(&campaign.id, None, None, None)
+            .await
+            .unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
@@ -687,12 +645,14 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members_with_query(
+            .campaign_members(
                 &campaign.id,
-                &MembersQuery {
+                None,
+                None,
+                Some(MembersQuery {
                     cursor: None,
                     page_size: None,
-                },
+                }),
             )
             .await
             .unwrap();
@@ -703,7 +663,17 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members_with_details(&campaign.id)
+            .campaign_members(
+                &campaign.id,
+                Some(MemberFields::all()),
+                Some(MemberIncludes {
+                    address: Some(AddressFields::all()),
+                    currently_entitled_tiers: Some(TierFields::all()),
+                    user: Some(UserFields::all()),
+                    ..Default::default()
+                }),
+                None,
+            )
             .await
             .unwrap();
     }
@@ -713,12 +683,19 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members_with_details_and_query(
+            .campaign_members(
                 &campaign.id,
-                &MembersQuery {
+                Some(MemberFields::all()),
+                Some(MemberIncludes {
+                    address: Some(AddressFields::all()),
+                    currently_entitled_tiers: Some(TierFields::all()),
+                    user: Some(UserFields::all()),
+                    ..Default::default()
+                }),
+                Some(MembersQuery {
                     cursor: None,
                     page_size: None,
-                },
+                }),
             )
             .await
             .unwrap();
@@ -733,14 +710,24 @@ mod tests {
     async fn test_member_with_details() {
         let client = client();
         let member = member().await;
-        client.member_with_details(&member.id).await.unwrap();
+        client
+            .member(
+                &member.id,
+                Some(MemberFields::all()),
+                Some(MemberIncludes::all()),
+            )
+            .await
+            .unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
     async fn test_campaign_posts() {
         let client = client();
         let campaign = campaign().await;
-        client.campaign_posts(&campaign.id).await.unwrap();
+        client
+            .campaign_posts(&campaign.id, None, None, None)
+            .await
+            .unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
@@ -748,12 +735,14 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_posts_with_query(
+            .campaign_posts(
                 &campaign.id,
-                &PostsQuery {
+                None,
+                None,
+                Some(PostsQuery {
                     cursor: None,
                     page_size: None,
-                },
+                }),
             )
             .await
             .unwrap();
@@ -764,7 +753,12 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_posts_with_details(&campaign.id)
+            .campaign_posts(
+                &campaign.id,
+                Some(PostFields::all()),
+                Some(PostIncludes::all()),
+                None,
+            )
             .await
             .unwrap();
     }
@@ -778,7 +772,10 @@ mod tests {
     async fn test_post_with_details() {
         let client = client();
         let post = post().await;
-        client.campaign_posts_with_details(&post.id).await.unwrap();
+        client
+            .post(&post.id, Some(PostFields::all()), Some(PostIncludes::all()))
+            .await
+            .unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]

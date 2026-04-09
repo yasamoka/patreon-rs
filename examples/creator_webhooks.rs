@@ -26,7 +26,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     };
 
-    let campaigns = client.campaigns().await?;
+    let campaigns = client.campaigns(None, None).await?;
     let campaign_id = opt_env("CAMPAIGN_ID")
         .or_else(|| campaigns.data.first().map(|c| c.id.clone()))
         .expect("CAMPAIGN_ID is required (or ensure the token has at least one campaign)");
