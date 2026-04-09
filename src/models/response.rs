@@ -2,7 +2,6 @@
 //!
 //! JSON:API response wrappers.
 
-use super::serde_helpers::de_null_default;
 use serde::{Deserialize, Serialize};
 
 /// JSON:API response wrapper.
@@ -11,42 +10,34 @@ pub struct ApiResponse<D> {
     /// Primary data.
     pub data: D,
     /// Included related resources.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub included: Vec<serde_json::Value>,
+    pub included: Option<Vec<serde_json::Value>>,
     /// Pagination links.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub links: PaginationLinks,
+    pub links: Option<PaginationLinks>,
     /// Metadata.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub meta: serde_json::Value,
+    pub meta: Option<serde_json::Value>,
 }
 
 /// Pagination links.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PaginationLinks {
     /// First page.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub first: String,
+    pub first: Option<String>,
     /// Previous page.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub prev: String,
+    pub prev: Option<String>,
     /// Next page.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub next: String,
+    pub next: Option<String>,
     /// Last page.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub last: String,
+    pub last: Option<String>,
     /// Current page.
-    #[serde(rename = "self", default, deserialize_with = "de_null_default")]
-    pub self_link: String,
+    #[serde(rename = "self")]
+    pub self_link: Option<String>,
 }
 
 /// Pagination metadata.
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PaginationMeta {
     /// Total count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub count: i32,
+    pub count: Option<i32>,
 }
 
 /// Single resource response.
@@ -66,21 +57,15 @@ pub struct ApiError {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiErrorDetail {
     /// Error code.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub code: i32,
+    pub code: Option<i32>,
     /// HTTP status code (string).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub status: String,
+    pub status: Option<String>,
     /// Error title.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub title: String,
+    pub title: Option<String>,
     /// Error detail.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub detail: String,
+    pub detail: Option<String>,
     /// Error code name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub code_name: String,
+    pub code_name: Option<String>,
     /// Error ID.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub id: String,
+    pub id: Option<String>,
 }

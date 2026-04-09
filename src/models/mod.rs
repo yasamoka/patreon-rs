@@ -9,7 +9,6 @@
 mod attributes;
 mod resources;
 mod response;
-mod serde_helpers;
 
 pub use attributes::*;
 pub use resources::*;

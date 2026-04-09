@@ -23,7 +23,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut is_active_patron = false;
 
-    for item in resp.included {
+    for item in resp.included.unwrap_or_default() {
         let Ok(m) = serde_json::from_value::<MemberResource>(item) else {
             continue;
         };
@@ -40,7 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
 
         let attrs = m.attributes.unwrap_or_default();
-        if attrs.patron_status == PatronStatus::ActivePatron {
+        if attrs.patron_status.unwrap_or_default() == PatronStatus::ActivePatron {
             is_active_patron = true;
             break;
         }

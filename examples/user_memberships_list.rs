@@ -13,7 +13,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let mut count = 0usize;
 
-    for item in resp.included {
+    for item in resp.included.unwrap_or_default() {
         let Ok(resource) = serde_json::from_value::<MemberResource>(item) else {
             continue;
         };
@@ -26,8 +26,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             "member_id={} patron_status={:?} entitled_cents={} lifetime_cents={}",
             resource.id,
             attrs.patron_status,
-            attrs.currently_entitled_amount_cents,
-            attrs.lifetime_support_cents
+            attrs.currently_entitled_amount_cents.unwrap_or_default(),
+            attrs.lifetime_support_cents.unwrap_or_default()
         );
         count += 1;
     }

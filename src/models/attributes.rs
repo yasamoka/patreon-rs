@@ -2,337 +2,199 @@
 //!
 //! Each resource type has a corresponding attributes struct.
 
-use super::serde_helpers::{de_null_default, de_null_unix_epoch, unix_epoch};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 
 // ============== User ==============
 
 /// User attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct UserAttributes {
     /// Email address.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub email: String,
+    pub email: Option<String>,
 
     /// Full name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub full_name: String,
+    pub full_name: Option<String>,
 
     /// First name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub first_name: String,
+    pub first_name: Option<String>,
 
     /// Last name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub last_name: String,
+    pub last_name: Option<String>,
 
     /// Vanity username.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub vanity: String,
+    pub vanity: Option<String>,
 
     /// Bio/about text.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub about: String,
+    pub about: Option<String>,
 
     /// Avatar image URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image_url: String,
+    pub image_url: Option<String>,
 
     /// Thumbnail URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thumb_url: String,
+    pub thumb_url: Option<String>,
 
     /// Patreon profile URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// Whether the user is a creator.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_creator: bool,
+    pub is_creator: Option<bool>,
 
     /// Whether the email is verified.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_email_verified: bool,
+    pub is_email_verified: Option<bool>,
 
     /// Account creation time.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created: DateTime<Utc>,
+    pub created: Option<DateTime<Utc>>,
 
     /// Whether pledges are hidden.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub hide_pledges: bool,
+    pub hide_pledges: Option<bool>,
 
     /// Like count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub like_count: i32,
+    pub like_count: Option<i32>,
 
     /// Social connections.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub social_connections: serde_json::Value,
-}
-
-impl Default for UserAttributes {
-    fn default() -> Self {
-        Self {
-            email: String::new(),
-            full_name: String::new(),
-            first_name: String::new(),
-            last_name: String::new(),
-            vanity: String::new(),
-            about: String::new(),
-            image_url: String::new(),
-            thumb_url: String::new(),
-            url: String::new(),
-            is_creator: false,
-            is_email_verified: false,
-            created: unix_epoch(),
-            hide_pledges: false,
-            like_count: 0,
-            social_connections: serde_json::Value::default(),
-        }
-    }
+    pub social_connections: Option<serde_json::Value>,
 }
 
 // ============== Campaign ==============
 
 /// Campaign attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct CampaignAttributes {
     /// Campaign creation time.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Creation name / what the creator makes.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub creation_name: String,
+    pub creation_name: Option<String>,
 
     /// Discord server ID.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub discord_server_id: String,
+    pub discord_server_id: Option<String>,
 
     /// Google Analytics ID
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub google_analytics_id: String,
+    pub google_analytics_id: Option<String>,
 
     /// Whether the campaign charges immediately.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_charged_immediately: bool,
+    pub is_charged_immediately: Option<bool>,
 
     /// Whether the campaign charges monthly.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_monthly: bool,
+    pub is_monthly: Option<bool>,
 
     /// Whether the campaign is marked NSFW.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_nsfw: bool,
+    pub is_nsfw: Option<bool>,
 
     /// Main image URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image_url: String,
+    pub image_url: Option<String>,
 
     /// Small main image URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image_small_url: String,
+    pub image_small_url: Option<String>,
 
     /// Cover photo URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub cover_photo_url: String,
+    pub cover_photo_url: Option<String>,
 
     /// Cover photo URL sizes.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub cover_photo_url_sizes: serde_json::Value,
+    pub cover_photo_url_sizes: Option<serde_json::Value>,
 
     /// Main video embed HTML.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub main_video_embed: String,
+    pub main_video_embed: Option<String>,
 
     /// Main video URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub main_video_url: String,
+    pub main_video_url: Option<String>,
 
     /// Thanks video URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thanks_video_url: String,
+    pub thanks_video_url: Option<String>,
 
     /// Thanks message.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thanks_msg: String,
+    pub thanks_msg: Option<String>,
 
     /// Thanks embed HTML.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thanks_embed: String,
+    pub thanks_embed: Option<String>,
 
     /// One-liner.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub one_liner: String,
+    pub one_liner: Option<String>,
 
     /// Patron count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub patron_count: i32,
+    pub patron_count: Option<i32>,
 
     /// Paid member count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub paid_member_count: i32,
+    pub paid_member_count: Option<i32>,
 
     /// Pledge sum in cents.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub pledge_sum_cents: i32,
+    pub pledge_sum_cents: Option<i32>,
 
     /// Currency.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub pledge_sum_currency: String,
+    pub pledge_sum_currency: Option<String>,
 
     /// Published at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub published_at: DateTime<Utc>,
+    pub published_at: Option<DateTime<Utc>>,
 
     /// Summary.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub summary: String,
+    pub summary: Option<String>,
 
     /// Campaign URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// Vanity.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub vanity: String,
+    pub vanity: Option<String>,
 
     /// Pay-per name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub pay_per_name: String,
+    pub pay_per_name: Option<String>,
 
     /// Whether the campaign is published.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_published: bool,
+    pub is_published: Option<bool>,
 
     /// Whether earnings are visible.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub show_earnings: bool,
-}
-
-impl Default for CampaignAttributes {
-    fn default() -> Self {
-        Self {
-            created_at: unix_epoch(),
-            creation_name: String::new(),
-            discord_server_id: String::new(),
-            google_analytics_id: String::new(),
-            is_charged_immediately: false,
-            is_monthly: false,
-            is_nsfw: false,
-            image_url: String::new(),
-            image_small_url: String::new(),
-            cover_photo_url: String::new(),
-            cover_photo_url_sizes: serde_json::Value::default(),
-            main_video_embed: String::new(),
-            main_video_url: String::new(),
-            thanks_video_url: String::new(),
-            thanks_msg: String::new(),
-            thanks_embed: String::new(),
-            one_liner: String::new(),
-            patron_count: 0,
-            paid_member_count: 0,
-            pledge_sum_cents: 0,
-            pledge_sum_currency: String::new(),
-            published_at: unix_epoch(),
-            summary: String::new(),
-            url: String::new(),
-            vanity: String::new(),
-            pay_per_name: String::new(),
-            is_published: false,
-            show_earnings: false,
-        }
-    }
+    pub show_earnings: Option<bool>,
 }
 
 // ============== Member ==============
 
 /// Member attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct MemberAttributes {
     /// Patron status.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub patron_status: PatronStatus,
+    pub patron_status: Option<PatronStatus>,
 
     /// Whether this member is following.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_follower: bool,
+    pub is_follower: Option<bool>,
 
     /// Full name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub full_name: String,
+    pub full_name: Option<String>,
 
     /// Email.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub email: String,
+    pub email: Option<String>,
 
     /// Currently entitled amount (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub currently_entitled_amount_cents: i32,
+    pub currently_entitled_amount_cents: Option<i32>,
 
     /// Lifetime support (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub lifetime_support_cents: i32,
+    pub lifetime_support_cents: Option<i32>,
 
     /// Last charge date.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub last_charge_date: DateTime<Utc>,
+    pub last_charge_date: Option<DateTime<Utc>>,
 
     /// Last charge status.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub last_charge_status: ChargeStatus,
+    pub last_charge_status: Option<ChargeStatus>,
 
     /// Next charge date.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub next_charge_date: DateTime<Utc>,
+    pub next_charge_date: Option<DateTime<Utc>>,
 
     /// Pledge relationship start.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub pledge_relationship_start: DateTime<Utc>,
+    pub pledge_relationship_start: Option<DateTime<Utc>>,
 
     /// Note.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub note: String,
+    pub note: Option<String>,
 
     /// Will pay amount (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub will_pay_amount_cents: i32,
+    pub will_pay_amount_cents: Option<i32>,
 
     /// Campaign currency.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub campaign_currency: String,
+    pub campaign_currency: Option<String>,
 
     /// Campaign lifetime support (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub campaign_lifetime_support_cents: i32,
+    pub campaign_lifetime_support_cents: Option<i32>,
 
     /// Campaign pledge amount (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub campaign_pledge_amount_cents: i32,
-}
-
-impl Default for MemberAttributes {
-    fn default() -> Self {
-        Self {
-            patron_status: PatronStatus::default(),
-            is_follower: false,
-            full_name: String::new(),
-            email: String::new(),
-            currently_entitled_amount_cents: 0,
-            lifetime_support_cents: 0,
-            last_charge_date: unix_epoch(),
-            last_charge_status: ChargeStatus::default(),
-            next_charge_date: unix_epoch(),
-            pledge_relationship_start: unix_epoch(),
-            note: String::new(),
-            will_pay_amount_cents: 0,
-            campaign_currency: String::new(),
-            campaign_lifetime_support_cents: 0,
-            campaign_pledge_amount_cents: 0,
-        }
-    }
+    pub campaign_pledge_amount_cents: Option<i32>,
 }
 
 /// Patron status.
@@ -386,542 +248,313 @@ impl Default for ChargeStatus {
 // ============== Tier ==============
 
 /// Tier attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct TierAttributes {
     /// Tier amount (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub amount_cents: i32,
+    pub amount_cents: Option<i32>,
 
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Description.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub description: String,
+    pub description: Option<String>,
 
     /// Discord role IDs.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub discord_role_ids: Vec<String>,
+    pub discord_role_ids: Option<Vec<String>>,
 
     /// Edited at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub edited_at: DateTime<Utc>,
+    pub edited_at: Option<DateTime<Utc>>,
 
     /// Image URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image_url: String,
+    pub image_url: Option<String>,
 
     /// Patron count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub patron_count: i32,
+    pub patron_count: Option<i32>,
 
     /// Post count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub post_count: i32,
+    pub post_count: Option<i32>,
 
     /// Whether published.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub published: bool,
+    pub published: Option<bool>,
 
     /// Published at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub published_at: DateTime<Utc>,
+    pub published_at: Option<DateTime<Utc>>,
 
     /// Title.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub title: String,
+    pub title: Option<String>,
 
     /// Unpublished at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub unpublished_at: DateTime<Utc>,
+    pub unpublished_at: Option<DateTime<Utc>>,
 
     /// Tier URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// User limit.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub user_limit: i32,
+    pub user_limit: Option<i32>,
 
     /// Remaining capacity.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub remaining: i32,
-}
-
-impl Default for TierAttributes {
-    fn default() -> Self {
-        Self {
-            amount_cents: 0,
-            created_at: unix_epoch(),
-            description: String::new(),
-            discord_role_ids: Vec::new(),
-            edited_at: unix_epoch(),
-            image_url: String::new(),
-            patron_count: 0,
-            post_count: 0,
-            published: false,
-            published_at: unix_epoch(),
-            title: String::new(),
-            unpublished_at: unix_epoch(),
-            url: String::new(),
-            user_limit: 0,
-            remaining: 0,
-        }
-    }
+    pub remaining: Option<i32>,
 }
 
 // ============== Post ==============
 
 /// Post attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct PostAttributes {
     /// Title.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub title: String,
+    pub title: Option<String>,
 
     /// Content (HTML).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub content: String,
+    pub content: Option<String>,
 
     /// Whether public.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_public: bool,
+    pub is_public: Option<bool>,
 
     /// Whether paid.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_paid: bool,
+    pub is_paid: Option<bool>,
 
     /// Published at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub published_at: DateTime<Utc>,
+    pub published_at: Option<DateTime<Utc>>,
 
     /// Edited at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub edited_at: DateTime<Utc>,
+    pub edited_at: Option<DateTime<Utc>>,
 
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Embed data.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub embed: serde_json::Value,
+    pub embed: Option<serde_json::Value>,
 
     /// Embed URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub embed_url: String,
+    pub embed_url: Option<String>,
 
     /// App ID.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub app_id: i64,
+    pub app_id: Option<i64>,
 
     /// App status.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub app_status: String,
+    pub app_status: Option<String>,
 
     /// Image.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image: serde_json::Value,
+    pub image: Option<serde_json::Value>,
 
     /// Whether this is a teaser.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_teaser: bool,
+    pub is_teaser: Option<bool>,
 
     /// Teaser text.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub teaser_text: String,
+    pub teaser_text: Option<String>,
 
     /// Like count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub like_count: i32,
+    pub like_count: Option<i32>,
 
     /// Comment count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub comment_count: i32,
+    pub comment_count: Option<i32>,
 
     /// Post URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub url: String,
+    pub url: Option<String>,
 
     /// Post type.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub post_type: String,
+    pub post_type: Option<String>,
 
     /// Post file.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub post_file: serde_json::Value,
+    pub post_file: Option<serde_json::Value>,
 
     /// Post metadata.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub post_metadata: serde_json::Value,
+    pub post_metadata: Option<serde_json::Value>,
 
     /// Minimum cents pledged to view.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub min_cents_pledged_to_view: i32,
+    pub min_cents_pledged_to_view: Option<i32>,
 
     /// Thumbnail URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thumbnail_url: String,
+    pub thumbnail_url: Option<String>,
 
     /// Thumbnail.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub thumbnail: serde_json::Value,
-}
-
-impl Default for PostAttributes {
-    fn default() -> Self {
-        Self {
-            title: String::new(),
-            content: String::new(),
-            is_public: false,
-            is_paid: false,
-            published_at: unix_epoch(),
-            edited_at: unix_epoch(),
-            created_at: unix_epoch(),
-            embed: serde_json::Value::default(),
-            embed_url: String::new(),
-            app_id: 0,
-            app_status: String::new(),
-            image: serde_json::Value::default(),
-            is_teaser: false,
-            teaser_text: String::new(),
-            like_count: 0,
-            comment_count: 0,
-            url: String::new(),
-            post_type: String::new(),
-            post_file: serde_json::Value::default(),
-            post_metadata: serde_json::Value::default(),
-            min_cents_pledged_to_view: 0,
-            thumbnail_url: String::new(),
-            thumbnail: serde_json::Value::default(),
-        }
-    }
+    pub thumbnail: Option<serde_json::Value>,
 }
 
 // ============== Benefit ==============
 
 /// Benefit attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct BenefitAttributes {
     /// Title.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub title: String,
+    pub title: Option<String>,
 
     /// Description.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub description: String,
+    pub description: Option<String>,
 
     /// Benefit type.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub benefit_type: String,
+    pub benefit_type: Option<String>,
 
     /// Rule type.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub rule_type: String,
+    pub rule_type: Option<String>,
 
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Whether published.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_published: bool,
+    pub is_published: Option<bool>,
 
     /// Whether deleted.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_deleted: bool,
+    pub is_deleted: Option<bool>,
 
     /// Whether deliverable.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub is_deliverable: bool,
+    pub is_deliverable: Option<bool>,
 
     /// Deliverables due today count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub deliverables_due_today_count: i32,
+    pub deliverables_due_today_count: Option<i32>,
 
     /// Delivered deliverables count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub delivered_deliverables_count: i32,
+    pub delivered_deliverables_count: Option<i32>,
 
     /// Not delivered deliverables count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub not_delivered_deliverables_count: i32,
+    pub not_delivered_deliverables_count: Option<i32>,
 
     /// Next deliverable due date.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub next_deliverable_due_date: DateTime<Utc>,
+    pub next_deliverable_due_date: Option<DateTime<Utc>>,
 
     /// Tiers count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub tiers_count: i32,
+    pub tiers_count: Option<i32>,
 
     /// App external ID.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub app_external_id: String,
+    pub app_external_id: Option<String>,
 
     /// App metadata.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub app_meta: serde_json::Value,
-}
-
-impl Default for BenefitAttributes {
-    fn default() -> Self {
-        Self {
-            title: String::new(),
-            description: String::new(),
-            benefit_type: String::new(),
-            rule_type: String::new(),
-            created_at: unix_epoch(),
-            is_published: false,
-            is_deleted: false,
-            is_deliverable: false,
-            deliverables_due_today_count: 0,
-            delivered_deliverables_count: 0,
-            not_delivered_deliverables_count: 0,
-            next_deliverable_due_date: unix_epoch(),
-            tiers_count: 0,
-            app_external_id: String::new(),
-            app_meta: serde_json::Value::default(),
-        }
-    }
+    pub app_meta: Option<serde_json::Value>,
 }
 
 // ============== Address ==============
 
 /// Address attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct AddressAttributes {
     /// Addressee.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub addressee: String,
+    pub addressee: Option<String>,
 
     /// City.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub city: String,
+    pub city: Option<String>,
 
     /// Country.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub country: String,
+    pub country: Option<String>,
 
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Line 1.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub line_1: String,
+    pub line_1: Option<String>,
 
     /// Line 2.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub line_2: String,
+    pub line_2: Option<String>,
 
     /// Phone number.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub phone_number: String,
+    pub phone_number: Option<String>,
 
     /// Postal code.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub postal_code: String,
+    pub postal_code: Option<String>,
 
     /// State/region.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub state: String,
+    pub state: Option<String>,
 
     /// Whether confirmed.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub confirmed: bool,
+    pub confirmed: Option<bool>,
 
     /// Confirmed at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub confirmed_at: DateTime<Utc>,
-}
-
-impl Default for AddressAttributes {
-    fn default() -> Self {
-        Self {
-            addressee: String::new(),
-            city: String::new(),
-            country: String::new(),
-            created_at: unix_epoch(),
-            line_1: String::new(),
-            line_2: String::new(),
-            phone_number: String::new(),
-            postal_code: String::new(),
-            state: String::new(),
-            confirmed: false,
-            confirmed_at: unix_epoch(),
-        }
-    }
+    pub confirmed_at: Option<DateTime<Utc>>,
 }
 
 // ============== Goal ==============
 
 /// Goal attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct GoalAttributes {
     /// Amount (cents).
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub amount_cents: i32,
+    pub amount_cents: Option<i32>,
 
     /// Completed percentage.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub completed_percentage: i32,
+    pub completed_percentage: Option<i32>,
 
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Description.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub description: String,
+    pub description: Option<String>,
 
     /// Reached at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub reached_at: DateTime<Utc>,
+    pub reached_at: Option<DateTime<Utc>>,
 
     /// Title.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub title: String,
-}
-
-impl Default for GoalAttributes {
-    fn default() -> Self {
-        Self {
-            amount_cents: 0,
-            completed_percentage: 0,
-            created_at: unix_epoch(),
-            description: String::new(),
-            reached_at: unix_epoch(),
-            title: String::new(),
-        }
-    }
+    pub title: Option<String>,
 }
 
 // ============== Media ==============
 
 /// Media attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct MediaAttributes {
     /// Created at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub created_at: DateTime<Utc>,
+    pub created_at: Option<DateTime<Utc>>,
 
     /// Download URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub download_url: String,
+    pub download_url: Option<String>,
 
     /// File name.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub file_name: String,
+    pub file_name: Option<String>,
 
     /// Image URLs.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub image_urls: serde_json::Value,
+    pub image_urls: Option<serde_json::Value>,
 
     /// Metadata.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub metadata: serde_json::Value,
+    pub metadata: Option<serde_json::Value>,
 
     /// MIME type.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub mimetype: String,
+    pub mimetype: Option<String>,
 
     /// Owner ID.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub owner_id: String,
+    pub owner_id: Option<String>,
 
     /// Owner relationship.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub owner_relationship: String,
+    pub owner_relationship: Option<String>,
 
     /// Owner type.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub owner_type: String,
+    pub owner_type: Option<String>,
 
     /// Size in bytes.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub size_bytes: i64,
+    pub size_bytes: Option<i64>,
 
     /// State.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub state: String,
+    pub state: Option<String>,
 
     /// Upload expires at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub upload_expires_at: DateTime<Utc>,
+    pub upload_expires_at: Option<DateTime<Utc>>,
 
     /// Upload parameters.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub upload_parameters: serde_json::Value,
+    pub upload_parameters: Option<serde_json::Value>,
 
     /// Upload URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub upload_url: String,
-}
-
-impl Default for MediaAttributes {
-    fn default() -> Self {
-        Self {
-            created_at: unix_epoch(),
-            download_url: String::new(),
-            file_name: String::new(),
-            image_urls: serde_json::Value::default(),
-            metadata: serde_json::Value::default(),
-            mimetype: String::new(),
-            owner_id: String::new(),
-            owner_relationship: String::new(),
-            owner_type: String::new(),
-            size_bytes: 0,
-            state: String::new(),
-            upload_expires_at: unix_epoch(),
-            upload_parameters: serde_json::Value::default(),
-            upload_url: String::new(),
-        }
-    }
+    pub upload_url: Option<String>,
 }
 
 // ============== Webhook ==============
 
 /// Webhook attributes.
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct WebhookAttributes {
     /// Last attempted at.
-    #[serde(default = "unix_epoch", deserialize_with = "de_null_unix_epoch")]
-    pub last_attempted_at: DateTime<Utc>,
+    pub last_attempted_at: Option<DateTime<Utc>>,
 
     /// Consecutive failure count.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub num_consecutive_times_failed: i32,
+    pub num_consecutive_times_failed: Option<i32>,
 
     /// Whether paused.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub paused: bool,
+    pub paused: Option<bool>,
 
     /// Secret.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub secret: String,
+    pub secret: Option<String>,
 
     /// Trigger list.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub triggers: Vec<WebhookTrigger>,
+    pub triggers: Option<Vec<WebhookTrigger>>,
 
     /// Webhook URL.
-    #[serde(default, deserialize_with = "de_null_default")]
-    pub uri: String,
-}
-
-impl Default for WebhookAttributes {
-    fn default() -> Self {
-        Self {
-            last_attempted_at: unix_epoch(),
-            num_consecutive_times_failed: 0,
-            paused: false,
-            secret: String::new(),
-            triggers: Vec::new(),
-            uri: String::new(),
-        }
-    }
+    pub uri: Option<String>,
 }
 
 /// Webhook trigger type.
