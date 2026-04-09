@@ -263,7 +263,7 @@ impl PatreonCreatorClient {
     ///
     /// Returns detailed campaign information including creator info.
     pub async fn campaigns_with_details(&self) -> Result<ListResponse<CampaignResource>> {
-        self.get("/campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,pledge_sum_cents,pledge_sum_currency,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity&fields[user]=full_name,image_url,url").await
+        self.get("/campaigns?include=creator&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity&fields[user]=full_name,image_url,url").await
     }
 
     /// Fetches a specific campaign.
@@ -282,7 +282,7 @@ impl PatreonCreatorClient {
         &self,
         campaign_id: &str,
     ) -> Result<SingleResponse<CampaignResource>> {
-        self.get(&format!("/campaigns/{}?include=tiers,tiers.benefits,creator,goals&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,pledge_sum_cents,pledge_sum_currency,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity,show_earnings&fields[tier]=amount_cents,created_at,description,discord_role_ids,edited_at,image_url,patron_count,post_count,published,published_at,title,unpublished_at,url,user_limit&fields[benefit]=benefit_type,created_at,deliverables_due_today_count,delivered_deliverables_count,description,is_deleted,is_published,next_deliverable_due_date,not_delivered_deliverables_count,rule_type,tiers_count,title&fields[goal]=amount_cents,completed_percentage,created_at,description,reached_at,title&fields[user]=full_name,image_url,url", campaign_id)).await
+        self.get(&format!("/campaigns/{}?include=tiers,tiers.benefits,creator,goals&fields[campaign]=created_at,creation_name,discord_server_id,image_url,image_small_url,is_charged_immediately,is_monthly,is_nsfw,main_video_embed,main_video_url,one_liner,patron_count,pay_per_name,published_at,summary,thanks_embed,thanks_msg,thanks_video_url,url,vanity,show_earnings&fields[tier]=amount_cents,created_at,description,discord_role_ids,edited_at,image_url,patron_count,post_count,published,published_at,title,unpublished_at,url,user_limit&fields[benefit]=benefit_type,created_at,deliverables_due_today_count,delivered_deliverables_count,description,is_deleted,is_published,next_deliverable_due_date,not_delivered_deliverables_count,rule_type,tiers_count,title&fields[goal]=amount_cents,completed_percentage,created_at,description,reached_at,title&fields[user]=full_name,image_url,url", campaign_id)).await
     }
 
     // ==================== Members API ====================
@@ -407,7 +407,7 @@ impl PatreonCreatorClient {
         &self,
         campaign_id: &str,
     ) -> Result<ListResponse<PostResource>> {
-        self.get(&format!("/campaigns/{}/posts?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url,was_posted_by_campaign_owner,comment_count,like_count,teaser_text&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", campaign_id)).await
+        self.get(&format!("/campaigns/{}/posts?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", campaign_id)).await
     }
 
     /// Fetches a specific post.
@@ -420,7 +420,7 @@ impl PatreonCreatorClient {
 
     /// Fetches a post including related resources.
     pub async fn post_with_details(&self, post_id: &str) -> Result<SingleResponse<PostResource>> {
-        self.get(&format!("/posts/{}?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url,was_posted_by_campaign_owner,comment_count,like_count,teaser_text&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", post_id)).await
+        self.get(&format!("/posts/{}?include=user,campaign&fields[post]=app_id,app_status,content,embed_data,embed_url,is_paid,is_public,published_at,title,url&fields[user]=full_name,image_url,url,vanity&fields[campaign]=creation_name,url,vanity", post_id)).await
     }
 
     // ==================== Webhooks API ====================
@@ -551,8 +551,6 @@ pub mod campaign_fields {
     pub const ONE_LINER: &str = "one_liner";
     pub const PATRON_COUNT: &str = "patron_count";
     pub const PAY_PER_NAME: &str = "pay_per_name";
-    pub const PLEDGE_SUM_CENTS: &str = "pledge_sum_cents";
-    pub const PLEDGE_SUM_CURRENCY: &str = "pledge_sum_currency";
     pub const PUBLISHED_AT: &str = "published_at";
     pub const SUMMARY: &str = "summary";
     pub const THANKS_EMBED: &str = "thanks_embed";
@@ -657,7 +655,6 @@ mod tests {
     }
 
     #[tokio_shared_rt::test(shared)]
-    #[ignore]
     async fn test_campaigns_with_details() {
         let client = client();
         client.campaigns_with_details().await.unwrap();
@@ -669,7 +666,6 @@ mod tests {
     }
 
     #[tokio_shared_rt::test(shared)]
-    #[ignore]
     async fn test_campaign_with_tiers_and_benefits() {
         let client = client();
         let campaign = campaign().await;
@@ -764,7 +760,6 @@ mod tests {
     }
 
     #[tokio_shared_rt::test(shared)]
-    #[ignore]
     async fn test_campaign_posts_with_details() {
         let client = client();
         let campaign = campaign().await;
@@ -780,7 +775,6 @@ mod tests {
     }
 
     #[tokio_shared_rt::test(shared)]
-    #[ignore]
     async fn test_post_with_details() {
         let client = client();
         let post = post().await;
