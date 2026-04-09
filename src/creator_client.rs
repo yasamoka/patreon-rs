@@ -594,11 +594,202 @@ pub mod webhook_triggers {
 
 #[cfg(test)]
 mod tests {
+    use std::{env, sync::OnceLock};
+
+    use dotenvy::dotenv;
+    use tokio::sync::OnceCell;
+
     use super::*;
 
     #[test]
     fn test_new_creator_client() {
         let client = PatreonCreatorClient::new("test_token");
         assert_eq!(client.access_token, "test_token");
+    }
+
+    fn client() -> &'static PatreonCreatorClient {
+        static CLIENT: OnceLock<PatreonCreatorClient> = OnceLock::new();
+        CLIENT.get_or_init(|| {
+            dotenv().ok();
+            let access_token = env::var("PATREON_CREATOR_ACCESS_TOKEN").unwrap();
+            PatreonCreatorClient::new(access_token)
+        })
+    }
+
+    async fn campaign() -> &'static CampaignResource {
+        static CAMPAIGN: OnceCell<CampaignResource> = OnceCell::const_new();
+        CAMPAIGN
+            .get_or_init(async || {
+                let client = client();
+                let campaigns = client.campaigns().await.unwrap();
+                campaigns.data.into_iter().next().unwrap()
+            })
+            .await
+    }
+
+    async fn member() -> &'static MemberResource {
+        static MEMBER: OnceCell<MemberResource> = OnceCell::const_new();
+        MEMBER
+            .get_or_init(async || {
+                let client = client();
+                let campaign = campaign().await;
+                let members = client.campaign_members(&campaign.id).await.unwrap();
+                members.data.into_iter().next().unwrap()
+            })
+            .await
+    }
+
+    async fn post() -> &'static PostResource {
+        static POST: OnceCell<PostResource> = OnceCell::const_new();
+        POST.get_or_init(async || {
+            let client = client();
+            let campaign = campaign().await;
+            let posts = client.campaign_posts(&campaign.id).await.unwrap();
+            posts.data.into_iter().next().unwrap()
+        })
+        .await
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaigns() {
+        let client = client();
+        client.campaigns().await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    #[ignore]
+    async fn test_campaigns_with_details() {
+        let client = client();
+        client.campaigns_with_details().await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign() {
+        campaign().await;
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    #[ignore]
+    async fn test_campaign_with_tiers_and_benefits() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_with_tiers_and_benefits(&campaign.id)
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_members() {
+        let client = client();
+        let campaign = campaign().await;
+        client.campaign_members(&campaign.id).await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_members_with_query() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_members_with_query(
+                &campaign.id,
+                &MembersQuery {
+                    cursor: None,
+                    page_size: None,
+                },
+            )
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_members_with_details() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_members_with_details(&campaign.id)
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_members_with_details_and_query() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_members_with_details_and_query(
+                &campaign.id,
+                &MembersQuery {
+                    cursor: None,
+                    page_size: None,
+                },
+            )
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_member() {
+        member().await;
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_member_with_details() {
+        let client = client();
+        let member = member().await;
+        client.member_with_details(&member.id).await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_posts() {
+        let client = client();
+        let campaign = campaign().await;
+        client.campaign_posts(&campaign.id).await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_campaign_posts_with_query() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_posts_with_query(
+                &campaign.id,
+                &PostsQuery {
+                    cursor: None,
+                    page_size: None,
+                },
+            )
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    #[ignore]
+    async fn test_campaign_posts_with_details() {
+        let client = client();
+        let campaign = campaign().await;
+        client
+            .campaign_posts_with_details(&campaign.id)
+            .await
+            .unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_post() {
+        post().await;
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    #[ignore]
+    async fn test_post_with_details() {
+        let client = client();
+        let post = post().await;
+        client.campaign_posts_with_details(&post.id).await.unwrap();
+    }
+
+    #[tokio_shared_rt::test(shared)]
+    async fn test_webhooks() {
+        let client = client();
+        client.webhooks().await.unwrap();
     }
 }
