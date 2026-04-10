@@ -27,10 +27,11 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let campaigns_with_details = client
         .campaigns()
         .fields(CampaignFields::all())
-        .includes(CampaignIncludes {
-            creator: Some(UserFields::all()),
-            ..Default::default()
-        })
+        .includes(
+            CampaignIncludes::builder()
+                .creator(UserFields::all())
+                .build(),
+        )
         .call()
         .await?;
     println!(

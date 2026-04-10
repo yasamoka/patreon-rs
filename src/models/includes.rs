@@ -1,3 +1,5 @@
+use bon::Builder;
+
 use crate::{AddressFields, CampaignFields};
 
 use super::fields::{BenefitFields, Fields, GoalFields, TierFields, UserFields};
@@ -33,7 +35,7 @@ trait IncludesImpl {
     fn fields(&self) -> impl Iterator<Item = Option<String>>;
 }
 
-#[derive(Clone, Copy, Default, Eq, PartialEq)]
+#[derive(Builder, Clone, Copy, Default, Eq, PartialEq)]
 pub struct CampaignIncludes {
     pub tiers: Option<TierFields>,
     pub creator: Option<UserFields>,
@@ -86,7 +88,7 @@ impl IncludesImpl for CampaignIncludes {
     }
 }
 
-#[derive(Clone, Copy, Default, Eq, PartialEq)]
+#[derive(Builder, Clone, Copy, Default, Eq, PartialEq)]
 pub struct MemberIncludes {
     pub address: Option<AddressFields>,
     pub campaign: Option<CampaignFields>,
@@ -142,7 +144,7 @@ impl IncludesImpl for MemberIncludes {
     }
 }
 
-#[derive(Clone, Copy, Default, Eq, PartialEq)]
+#[derive(Builder, Clone, Copy, Default, Eq, PartialEq)]
 pub struct PostIncludes {
     pub user: Option<UserFields>,
     pub campaign: Option<CampaignFields>,

@@ -604,10 +604,11 @@ mod tests {
         client
             .campaigns()
             .fields(CampaignFields::all())
-            .includes(CampaignIncludes {
-                creator: Some(UserFields::all()),
-                ..Default::default()
-            })
+            .includes(
+                CampaignIncludes::builder()
+                    .creator(UserFields::all())
+                    .build(),
+            )
             .call()
             .await
             .unwrap();
@@ -660,12 +661,13 @@ mod tests {
         client
             .campaign_members(&campaign.id)
             .fields(MemberFields::all())
-            .includes(MemberIncludes {
-                address: Some(AddressFields::all()),
-                currently_entitled_tiers: Some(TierFields::all()),
-                user: Some(UserFields::all()),
-                ..Default::default()
-            })
+            .includes(
+                MemberIncludes::builder()
+                    .address(AddressFields::all())
+                    .currently_entitled_tiers(TierFields::all())
+                    .user(UserFields::all())
+                    .build(),
+            )
             .call()
             .await
             .unwrap();
@@ -678,12 +680,13 @@ mod tests {
         client
             .campaign_members(&campaign.id)
             .fields(MemberFields::all())
-            .includes(MemberIncludes {
-                address: Some(AddressFields::all()),
-                currently_entitled_tiers: Some(TierFields::all()),
-                user: Some(UserFields::all()),
-                ..Default::default()
-            })
+            .includes(
+                MemberIncludes::builder()
+                    .address(AddressFields::all())
+                    .currently_entitled_tiers(TierFields::all())
+                    .user(UserFields::all())
+                    .build(),
+            )
             .query(MembersQuery {
                 cursor: None,
                 page_size: None,

@@ -39,12 +39,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let members_with_details = client
         .campaign_members(&campaign_id)
         .fields(MemberFields::all())
-        .includes(MemberIncludes {
-            address: Some(AddressFields::all()),
-            currently_entitled_tiers: Some(TierFields::all()),
-            user: Some(UserFields::all()),
-            ..Default::default()
-        })
+        .includes(
+            MemberIncludes::builder()
+                .address(AddressFields::all())
+                .currently_entitled_tiers(TierFields::all())
+                .user(UserFields::all())
+                .build(),
+        )
         .call()
         .await?;
     println!(
@@ -55,12 +56,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let members_with_details_and_query = client
         .campaign_members(&campaign_id)
         .fields(MemberFields::all())
-        .includes(MemberIncludes {
-            address: Some(AddressFields::all()),
-            currently_entitled_tiers: Some(TierFields::all()),
-            user: Some(UserFields::all()),
-            ..Default::default()
-        })
+        .includes(
+            MemberIncludes::builder()
+                .address(AddressFields::all())
+                .currently_entitled_tiers(TierFields::all())
+                .user(UserFields::all())
+                .build(),
+        )
         .query(MembersQuery {
             cursor: None,
             page_size: Some(10),
