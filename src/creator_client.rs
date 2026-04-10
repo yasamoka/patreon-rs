@@ -22,6 +22,7 @@ use std::borrow::Cow;
 
 use crate::models::*;
 use crate::{API_BASE_URL, Error, Result};
+use bon::bon;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Serialize;
 
@@ -98,6 +99,7 @@ struct WebhookCampaignData {
     id: String,
 }
 
+#[bon]
 impl PatreonCreatorClient {
     /// Creates a new creator client.
     ///
@@ -243,6 +245,7 @@ impl PatreonCreatorClient {
     /// - `includes`: top-level includes
     /// # Required scopes
     /// - `campaigns`
+    #[builder]
     pub async fn campaigns(
         &self,
         fields: Option<CampaignFields>,
@@ -258,9 +261,10 @@ impl PatreonCreatorClient {
     /// - `id`: campaign ID
     /// - `fields`: campaign fields
     /// - `includes: top-level includes
+    #[builder]
     pub async fn campaign(
         &self,
-        id: &str,
+        #[builder(start_fn)] id: &str,
         fields: Option<CampaignFields>,
         includes: Option<CampaignIncludes>,
     ) -> Result<SingleResponse<CampaignResource>> {
@@ -279,10 +283,11 @@ impl PatreonCreatorClient {
     /// - `query`: query parameters
     /// # Required scopes
     /// - `campaigns.members`
+    #[builder]
     pub async fn campaign_members(
         &self,
-        campaign_id: &str,
-        member_fields: Option<MemberFields>,
+        #[builder(start_fn)] campaign_id: &str,
+        fields: Option<MemberFields>,
         includes: Option<MemberIncludes>,
         query: Option<MembersQuery>,
     ) -> Result<ListResponse<MemberResource>> {
@@ -290,7 +295,7 @@ impl PatreonCreatorClient {
             format!(
                 "/campaigns/{}/members{}",
                 campaign_id,
-                (member_fields, includes, query).query_params()
+                (fields, includes, query).query_params()
             )
             .as_str(),
         )
@@ -303,9 +308,10 @@ impl PatreonCreatorClient {
     /// - `id`: member ID
     /// - `fields`: member fields
     /// - `includes`: top-level includes
+    #[builder]
     pub async fn member(
         &self,
-        id: &str,
+        #[builder(start_fn)] id: &str,
         fields: Option<MemberFields>,
         includes: Option<MemberIncludes>,
     ) -> Result<SingleResponse<MemberResource>> {
@@ -319,15 +325,16 @@ impl PatreonCreatorClient {
     ///
     /// # Parameters
     /// - `campaign_id`: campaign ID
-    /// - `post_fields`: post fields
+    /// - `fields`: post fields
     /// - `includes`: top-level includes
     /// - `query`: query parameters
     /// # Required scopes
     /// - `campaigns.posts`
+    #[builder]
     pub async fn campaign_posts(
         &self,
-        campaign_id: &str,
-        post_fields: Option<PostFields>,
+        #[builder(start_fn)] campaign_id: &str,
+        fields: Option<PostFields>,
         includes: Option<PostIncludes>,
         query: Option<PostsQuery>,
     ) -> Result<ListResponse<PostResource>> {
@@ -335,7 +342,7 @@ impl PatreonCreatorClient {
             format!(
                 "/campaigns/{}/posts{}",
                 campaign_id,
-                (post_fields, includes, query).query_params()
+                (fields, includes, query).query_params()
             )
             .as_str(),
         )
@@ -348,9 +355,10 @@ impl PatreonCreatorClient {
     /// - `id`: post ID
     /// - `fieldws`: post fields
     /// - `includes`: top-level includes
+    #[builder]
     pub async fn post(
         &self,
-        id: &str,
+        #[builder(start_fn)] id: &str,
         fields: Option<PostFields>,
         includes: Option<PostIncludes>,
     ) -> Result<SingleResponse<PostResource>> {
@@ -555,7 +563,7 @@ mod tests {
         CAMPAIGN
             .get_or_init(async || {
                 let client = client();
-                let campaigns = client.campaigns(None, None).await.unwrap();
+                let campaigns = client.campaigns().call().await.unwrap();
                 campaigns.data.into_iter().next().unwrap()
             })
             .await
@@ -567,10 +575,7 @@ mod tests {
             .get_or_init(async || {
                 let client = client();
                 let campaign = campaign().await;
-                let members = client
-                    .campaign_members(&campaign.id, None, None, None)
-                    .await
-                    .unwrap();
+                let members = client.campaign_members(&campaign.id).call().await.unwrap();
                 members.data.into_iter().next().unwrap()
             })
             .await
@@ -581,10 +586,7 @@ mod tests {
         POST.get_or_init(async || {
             let client = client();
             let campaign = campaign().await;
-            let posts = client
-                .campaign_posts(&campaign.id, None, None, None)
-                .await
-                .unwrap();
+            let posts = client.campaign_posts(&campaign.id).call().await.unwrap();
             posts.data.into_iter().next().unwrap()
         })
         .await
@@ -593,20 +595,20 @@ mod tests {
     #[tokio_shared_rt::test(shared)]
     async fn test_campaigns() {
         let client = client();
-        client.campaigns(None, None).await.unwrap();
+        client.campaigns().call().await.unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
     async fn test_campaigns_with_details() {
         let client = client();
         client
-            .campaigns(
-                Some(CampaignFields::all()),
-                Some(CampaignIncludes {
-                    creator: Some(UserFields::all()),
-                    ..Default::default()
-                }),
-            )
+            .campaigns()
+            .fields(CampaignFields::all())
+            .includes(CampaignIncludes {
+                creator: Some(UserFields::all()),
+                ..Default::default()
+            })
+            .call()
             .await
             .unwrap();
     }
@@ -621,11 +623,10 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign(
-                &campaign.id,
-                Some(CampaignFields::all()),
-                Some(CampaignIncludes::all()),
-            )
+            .campaign(&campaign.id)
+            .fields(CampaignFields::all())
+            .includes(CampaignIncludes::all())
+            .call()
             .await
             .unwrap();
     }
@@ -634,10 +635,7 @@ mod tests {
     async fn test_campaign_members() {
         let client = client();
         let campaign = campaign().await;
-        client
-            .campaign_members(&campaign.id, None, None, None)
-            .await
-            .unwrap();
+        client.campaign_members(&campaign.id).call().await.unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
@@ -645,15 +643,12 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members(
-                &campaign.id,
-                None,
-                None,
-                Some(MembersQuery {
-                    cursor: None,
-                    page_size: None,
-                }),
-            )
+            .campaign_members(&campaign.id)
+            .query(MembersQuery {
+                cursor: None,
+                page_size: None,
+            })
+            .call()
             .await
             .unwrap();
     }
@@ -663,17 +658,15 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members(
-                &campaign.id,
-                Some(MemberFields::all()),
-                Some(MemberIncludes {
-                    address: Some(AddressFields::all()),
-                    currently_entitled_tiers: Some(TierFields::all()),
-                    user: Some(UserFields::all()),
-                    ..Default::default()
-                }),
-                None,
-            )
+            .campaign_members(&campaign.id)
+            .fields(MemberFields::all())
+            .includes(MemberIncludes {
+                address: Some(AddressFields::all()),
+                currently_entitled_tiers: Some(TierFields::all()),
+                user: Some(UserFields::all()),
+                ..Default::default()
+            })
+            .call()
             .await
             .unwrap();
     }
@@ -683,20 +676,19 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_members(
-                &campaign.id,
-                Some(MemberFields::all()),
-                Some(MemberIncludes {
-                    address: Some(AddressFields::all()),
-                    currently_entitled_tiers: Some(TierFields::all()),
-                    user: Some(UserFields::all()),
-                    ..Default::default()
-                }),
-                Some(MembersQuery {
-                    cursor: None,
-                    page_size: None,
-                }),
-            )
+            .campaign_members(&campaign.id)
+            .fields(MemberFields::all())
+            .includes(MemberIncludes {
+                address: Some(AddressFields::all()),
+                currently_entitled_tiers: Some(TierFields::all()),
+                user: Some(UserFields::all()),
+                ..Default::default()
+            })
+            .query(MembersQuery {
+                cursor: None,
+                page_size: None,
+            })
+            .call()
             .await
             .unwrap();
     }
@@ -711,11 +703,10 @@ mod tests {
         let client = client();
         let member = member().await;
         client
-            .member(
-                &member.id,
-                Some(MemberFields::all()),
-                Some(MemberIncludes::all()),
-            )
+            .member(&member.id)
+            .fields(MemberFields::all())
+            .includes(MemberIncludes::all())
+            .call()
             .await
             .unwrap();
     }
@@ -724,10 +715,7 @@ mod tests {
     async fn test_campaign_posts() {
         let client = client();
         let campaign = campaign().await;
-        client
-            .campaign_posts(&campaign.id, None, None, None)
-            .await
-            .unwrap();
+        client.campaign_posts(&campaign.id).call().await.unwrap();
     }
 
     #[tokio_shared_rt::test(shared)]
@@ -735,15 +723,12 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_posts(
-                &campaign.id,
-                None,
-                None,
-                Some(PostsQuery {
-                    cursor: None,
-                    page_size: None,
-                }),
-            )
+            .campaign_posts(&campaign.id)
+            .query(PostsQuery {
+                cursor: None,
+                page_size: None,
+            })
+            .call()
             .await
             .unwrap();
     }
@@ -753,12 +738,10 @@ mod tests {
         let client = client();
         let campaign = campaign().await;
         client
-            .campaign_posts(
-                &campaign.id,
-                Some(PostFields::all()),
-                Some(PostIncludes::all()),
-                None,
-            )
+            .campaign_posts(&campaign.id)
+            .fields(PostFields::all())
+            .includes(PostIncludes::all())
+            .call()
             .await
             .unwrap();
     }
@@ -773,7 +756,10 @@ mod tests {
         let client = client();
         let post = post().await;
         client
-            .post(&post.id, Some(PostFields::all()), Some(PostIncludes::all()))
+            .post(&post.id)
+            .fields(PostFields::all())
+            .includes(PostIncludes::all())
+            .call()
             .await
             .unwrap();
     }

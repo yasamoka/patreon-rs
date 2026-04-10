@@ -21,17 +21,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .build()?;
     client = client.with_http_client(http_client);
 
-    let campaigns = client.campaigns(None, None).await?;
+    let campaigns = client.campaigns().call().await?;
     println!("campaigns.count: {}", campaigns.data.len());
 
     let campaigns_with_details = client
-        .campaigns(
-            Some(CampaignFields::all()),
-            Some(CampaignIncludes {
-                creator: Some(UserFields::all()),
-                ..Default::default()
-            }),
-        )
+        .campaigns()
+        .fields(CampaignFields::all())
+        .includes(CampaignIncludes {
+            creator: Some(UserFields::all()),
+            ..Default::default()
+        })
+        .call()
         .await?;
     println!(
         "campaigns_with_details.count: {}",
@@ -42,15 +42,14 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .or_else(|| campaigns.data.first().map(|c| c.id.clone()))
         .expect("CAMPAIGN_ID is required (or ensure the token has at least one campaign)");
 
-    let campaign = client.campaign(&campaign_id, None, None).await?;
+    let campaign = client.campaign(&campaign_id).call().await?;
     println!("campaign.id: {}", campaign.data.id);
 
     let campaign_with_tiers_and_benefits = client
-        .campaign(
-            &campaign_id,
-            Some(CampaignFields::all()),
-            Some(CampaignIncludes::all()),
-        )
+        .campaign(&campaign_id)
+        .fields(CampaignFields::all())
+        .includes(CampaignIncludes::all())
+        .call()
         .await?;
     println!(
         "campaign_with_tiers_and_benefits.id: {}",
