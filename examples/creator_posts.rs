@@ -22,10 +22,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let posts_with_query = client
         .campaign_posts(&campaign_id)
-        .query(PostsQuery {
-            cursor: None,
-            page_size: Some(10),
-        })
+        .query(PostsQuery::builder().page_size(10).build())
         .call()
         .await?;
     println!(

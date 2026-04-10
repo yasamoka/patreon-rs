@@ -25,10 +25,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let members_with_query = client
         .campaign_members(&campaign_id)
-        .query(MembersQuery {
-            cursor: None,
-            page_size: Some(10),
-        })
+        .query(MembersQuery::builder().page_size(10).build())
         .call()
         .await?;
     println!(
@@ -63,10 +60,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
                 .user(UserFields::all())
                 .build(),
         )
-        .query(MembersQuery {
-            cursor: None,
-            page_size: Some(10),
-        })
+        .query(MembersQuery::builder().page_size(10).build())
         .call()
         .await?;
     println!(

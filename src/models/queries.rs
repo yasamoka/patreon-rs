@@ -1,3 +1,5 @@
+use bon::Builder;
+
 pub(crate) trait Query {
     fn query_params(&self) -> Option<String>;
 }
@@ -29,7 +31,7 @@ trait QueryImpl {
 }
 
 /// Query parameters for listing members.
-#[derive(Debug, Clone, Default)]
+#[derive(Builder, Debug, Clone, Default)]
 pub struct MembersQuery {
     /// Cursor (for pagination).
     pub cursor: Option<String>,
@@ -52,7 +54,7 @@ impl QueryImpl for MembersQuery {
 }
 
 /// Query parameters for listing posts.
-#[derive(Debug, Clone, Default)]
+#[derive(Builder, Debug, Clone, Default)]
 pub struct PostsQuery {
     /// Cursor (for pagination).
     pub cursor: Option<String>,
