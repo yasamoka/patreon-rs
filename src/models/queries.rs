@@ -6,17 +6,19 @@ pub(crate) trait Query {
 
 impl<T: QueryImpl> Query for T {
     fn query_params(&self) -> Option<String> {
-        match (self.cursor(), self.page_size()) {
+        const PAGE_CURSOR_KEY: &str = "page%5Bcursor%5D";
+        const PAGE_COUNT_KEY: &str = "page%5Bcount%5D";
+
+        match (
+            self.cursor(),
+            self.page_size()
+                .map(|page_size| page_size.min(Self::max_page_size())),
+        ) {
             (None, None) => None,
-            (None, Some(page_size)) => Some(format!(
-                "page[count]={}",
-                page_size.min(Self::max_page_size())
-            )),
-            (Some(cursor), None) => Some(format!("page[cursor]={cursor}")),
+            (None, Some(page_size)) => Some(format!("{PAGE_COUNT_KEY}={page_size}")),
+            (Some(cursor), None) => Some(format!("{PAGE_CURSOR_KEY}={cursor}")),
             (Some(cursor), Some(page_size)) => Some(format!(
-                "page[cursor]={}&page[count]={}",
-                cursor,
-                page_size.min(Self::max_page_size())
+                "{PAGE_CURSOR_KEY}={cursor}&{PAGE_COUNT_KEY}={page_size}",
             )),
         }
     }
