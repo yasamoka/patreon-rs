@@ -29,6 +29,7 @@ use governor::state::{InMemoryState, NotKeyed};
 use governor::{Quota, RateLimiter};
 use nonzero_ext::nonzero;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
+use secrecy::{ExposeSecret, SecretString};
 use serde::Serialize;
 
 /// Patreon creator (server) API client.
@@ -51,7 +52,7 @@ use serde::Serialize;
 /// ```
 #[derive(Debug)]
 pub struct PatreonCreatorClient {
-    access_token: String,
+    access_token: SecretString,
     http_client: reqwest::Client,
     client_limiter: RateLimiter<NotKeyed, InMemoryState, MonotonicClock>,
     access_token_limiter: RateLimiter<NotKeyed, InMemoryState, MonotonicClock>,
@@ -113,7 +114,7 @@ impl PatreonCreatorClient {
     /// # Parameters
     /// - `access_token`: creator access token
     ///   (available from <https://www.patreon.com/portal/registration/register-clients>)
-    pub fn new(access_token: impl Into<String>) -> Self {
+    pub fn new(access_token: impl Into<SecretString>) -> Self {
         Self {
             access_token: access_token.into(),
             http_client: reqwest::Client::new(),
@@ -150,7 +151,8 @@ impl PatreonCreatorClient {
         let mut headers = HeaderMap::new();
         headers.insert(
             AUTHORIZATION,
-            HeaderValue::from_str(&format!("Bearer {}", self.access_token)).expect("Invalid token"),
+            HeaderValue::from_str(&format!("Bearer {}", self.access_token.expose_secret()))
+                .expect("Invalid token"),
         );
         headers.insert(CONTENT_TYPE, HeaderValue::from_static("application/json"));
         headers
@@ -569,7 +571,7 @@ mod tests {
     #[test]
     fn test_new_creator_client() {
         let client = PatreonCreatorClient::new("test_token");
-        assert_eq!(client.access_token, "test_token");
+        assert_eq!(client.access_token.expose_secret(), "test_token");
     }
 
     fn client() -> &'static PatreonCreatorClient {
