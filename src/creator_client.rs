@@ -23,6 +23,11 @@ use std::borrow::Cow;
 use crate::models::*;
 use crate::{API_BASE_URL, Error, Result};
 use bon::bon;
+use futures::future::join;
+use governor::clock::MonotonicClock;
+use governor::state::{InMemoryState, NotKeyed};
+use governor::{Quota, RateLimiter};
+use nonzero_ext::nonzero;
 use reqwest::header::{AUTHORIZATION, CONTENT_TYPE, HeaderMap, HeaderValue};
 use serde::Serialize;
 
@@ -44,10 +49,12 @@ use serde::Serialize;
 /// // List members for a campaign
 /// let members = client.campaign_members("campaign_id").await?;
 /// ```
-#[derive(Debug, Clone)]
+#[derive(Debug)]
 pub struct PatreonCreatorClient {
     access_token: String,
     http_client: reqwest::Client,
+    client_limiter: RateLimiter<NotKeyed, InMemoryState, MonotonicClock>,
+    access_token_limiter: RateLimiter<NotKeyed, InMemoryState, MonotonicClock>,
     base_url: String,
 }
 
@@ -110,6 +117,10 @@ impl PatreonCreatorClient {
         Self {
             access_token: access_token.into(),
             http_client: reqwest::Client::new(),
+            client_limiter: RateLimiter::direct(
+                Quota::per_second(nonzero!(50u32)).allow_burst(nonzero!(100u32)),
+            ),
+            access_token_limiter: RateLimiter::direct(Quota::per_minute(nonzero!(100u32))),
             base_url: API_BASE_URL.to_string(),
         }
     }
@@ -126,6 +137,14 @@ impl PatreonCreatorClient {
         self
     }
 
+    async fn rate_limit(&self) {
+        join(
+            self.client_limiter.until_ready(),
+            self.access_token_limiter.until_ready(),
+        )
+        .await;
+    }
+
     /// Builds authorization headers.
     fn auth_headers(&self) -> HeaderMap {
         let mut headers = HeaderMap::new();
@@ -140,6 +159,7 @@ impl PatreonCreatorClient {
     /// Sends a GET request.
     async fn get<T: serde::de::DeserializeOwned>(&self, endpoint: &str) -> Result<T> {
         let url = format!("{}{}", self.base_url, endpoint);
+        self.rate_limit().await;
         let response = self
             .http_client
             .get(&url)
@@ -166,6 +186,7 @@ impl PatreonCreatorClient {
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.base_url, endpoint);
+        self.rate_limit().await;
         let response = self
             .http_client
             .post(&url)
@@ -193,6 +214,7 @@ impl PatreonCreatorClient {
         body: &B,
     ) -> Result<T> {
         let url = format!("{}{}", self.base_url, endpoint);
+        self.rate_limit().await;
         let response = self
             .http_client
             .patch(&url)
@@ -216,6 +238,7 @@ impl PatreonCreatorClient {
     /// Sends a DELETE request.
     async fn delete(&self, endpoint: &str) -> Result<()> {
         let url = format!("{}{}", self.base_url, endpoint);
+        self.rate_limit().await;
         let response = self
             .http_client
             .delete(&url)
