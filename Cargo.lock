@@ -1060,6 +1060,7 @@ dependencies = [
  "thiserror 2.0.17",
  "tokio",
  "tokio-shared-rt",
+ "url",
  "urlencoding",
 ]
 
@@ -1891,6 +1892,7 @@ dependencies = [
  "idna",
  "percent-encoding",
  "serde",
+ "serde_derive",
 ]
 
 [[package]]

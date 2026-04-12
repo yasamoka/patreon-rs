@@ -3,6 +3,7 @@
 //! JSON:API response wrappers.
 
 use serde::{Deserialize, Serialize};
+use url::Url;
 
 /// JSON:API response wrapper.
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -21,16 +22,16 @@ pub struct ApiResponse<D> {
 #[derive(Debug, Clone, Serialize, Deserialize, Default)]
 pub struct PaginationLinks {
     /// First page.
-    pub first: Option<String>,
+    pub first: Option<Url>,
     /// Previous page.
-    pub prev: Option<String>,
+    pub prev: Option<Url>,
     /// Next page.
-    pub next: Option<String>,
+    pub next: Option<Url>,
     /// Last page.
-    pub last: Option<String>,
+    pub last: Option<Url>,
     /// Current page.
     #[serde(rename = "self")]
-    pub self_link: Option<String>,
+    pub self_link: Option<Url>,
 }
 
 /// Pagination metadata.
