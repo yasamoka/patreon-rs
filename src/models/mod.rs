@@ -8,6 +8,7 @@
 
 mod attributes;
 mod fields;
+mod included;
 mod includes;
 mod queries;
 mod resources;
@@ -15,6 +16,7 @@ mod response;
 
 pub use attributes::*;
 pub use fields::*;
+pub use included::*;
 pub use includes::*;
 pub use queries::*;
 pub use resources::*;

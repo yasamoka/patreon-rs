@@ -7,11 +7,11 @@ use url::Url;
 
 /// JSON:API response wrapper.
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ApiResponse<D> {
+pub struct ApiResponse<D, I> {
     /// Primary data.
     pub data: D,
     /// Included related resources.
-    pub included: Option<Vec<serde_json::Value>>,
+    pub included: Option<Vec<I>>,
     /// Pagination links.
     pub links: Option<PaginationLinks>,
     /// Metadata.
@@ -42,10 +42,10 @@ pub struct PaginationMeta {
 }
 
 /// Single resource response.
-pub type SingleResponse<T> = ApiResponse<T>;
+pub type SingleResponse<D, I = serde_json::Value> = ApiResponse<D, I>;
 
 /// List resource response.
-pub type ListResponse<T> = ApiResponse<Vec<T>>;
+pub type ListResponse<D, I = serde_json::Value> = ApiResponse<Vec<D>, I>;
 
 /// API error response.
 #[derive(Debug, Clone, Serialize, Deserialize)]

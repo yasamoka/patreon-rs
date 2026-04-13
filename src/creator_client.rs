@@ -275,7 +275,7 @@ impl PatreonCreatorClient {
         &self,
         fields: Option<CampaignFields>,
         includes: Option<CampaignIncludes>,
-    ) -> Result<ListResponse<CampaignResource>> {
+    ) -> Result<ListResponse<CampaignResource, CampaignIncludedResource>> {
         self.get(format!("/campaigns{}", (fields, includes).query_params()).as_str())
             .await
     }
@@ -292,7 +292,7 @@ impl PatreonCreatorClient {
         #[builder(start_fn)] id: &str,
         fields: Option<CampaignFields>,
         includes: Option<CampaignIncludes>,
-    ) -> Result<SingleResponse<CampaignResource>> {
+    ) -> Result<SingleResponse<CampaignResource, CampaignIncludedResource>> {
         self.get(format!("/campaigns/{}{}", id, (fields, includes).query_params()).as_str())
             .await
     }
@@ -315,7 +315,7 @@ impl PatreonCreatorClient {
         fields: Option<MemberFields>,
         includes: Option<MemberIncludes>,
         query: Option<MembersQuery>,
-    ) -> Result<ListResponse<MemberResource>> {
+    ) -> Result<ListResponse<MemberResource, MemberIncludedResource>> {
         self.get(
             format!(
                 "/campaigns/{}/members{}",
@@ -339,7 +339,7 @@ impl PatreonCreatorClient {
         #[builder(start_fn)] id: &str,
         fields: Option<MemberFields>,
         includes: Option<MemberIncludes>,
-    ) -> Result<SingleResponse<MemberResource>> {
+    ) -> Result<SingleResponse<MemberResource, MemberIncludedResource>> {
         self.get(format!("/members/{}{}", id, (fields, includes).query_params()).as_str())
             .await
     }
@@ -362,7 +362,7 @@ impl PatreonCreatorClient {
         fields: Option<PostFields>,
         includes: Option<PostIncludes>,
         query: Option<PostsQuery>,
-    ) -> Result<ListResponse<PostResource>> {
+    ) -> Result<ListResponse<PostResource, PostIncludedResource>> {
         self.get(
             format!(
                 "/campaigns/{}/posts{}",
@@ -386,7 +386,7 @@ impl PatreonCreatorClient {
         #[builder(start_fn)] id: &str,
         fields: Option<PostFields>,
         includes: Option<PostIncludes>,
-    ) -> Result<SingleResponse<PostResource>> {
+    ) -> Result<SingleResponse<PostResource, PostIncludedResource>> {
         self.get(format!("/posts/{}{}", id, (fields, includes).query_params()).as_str())
             .await
     }

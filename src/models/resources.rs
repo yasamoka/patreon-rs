@@ -41,6 +41,14 @@ pub struct Resource<A> {
     pub relationships: Option<serde_json::Value>,
 }
 
+/// JSON:API included resource object.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct IncludedResource<A> {
+    /// Resource ID.
+    pub id: String,
+    pub attributes: Option<A>,
+}
+
 /// Resource reference (as used in relationships).
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ResourceRef {
